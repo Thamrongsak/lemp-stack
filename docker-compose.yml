@@ -1,0 +1,52 @@
+version: '2'
+services:
+
+  nginx:
+    image: nginx:alpine
+    container_name: lemp_nginx
+    restart: always
+    volumes:
+      - ./nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    volumes_from:
+      - php
+      - php7.2
+    ports:
+      - 80:80
+
+  php:
+    build: ./build/php
+    container_name: lemp_php-fpm
+    restart: always
+    volumes:
+      - ./www/:/var/www/html
+    expose:
+      - "9000"
+
+  php7.2:
+    build: ./build/php7.2
+    container_name: lemp_php7.2-fpm
+    restart: always
+    volumes_from:
+      - php
+    expose:
+      - "9000"
+
+  db:
+    image: mariadb:10.1
+    container_name: lemp_mariadb
+    restart: always
+    volumes:
+      # - ./mysql/initdb/:/docker-entrypoint-initdb.d
+      - ./mysql/data/:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3306:3306"
+      
+  pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: lemp-phpmyadmin
+    restart: always
+    ports:
+      - "8000:80"
