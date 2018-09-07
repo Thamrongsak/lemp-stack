@@ -3,10 +3,13 @@ FROM php:7.2-fpm-alpine
 MAINTAINER Thamrongsak Somkhokkruad <somkhokkruad.t@gmail.com>
 
 RUN apk upgrade --update && apk --no-cache add \
-    autoconf tzdata openntpd file g++ gcc binutils isl libatomic libc-dev musl-dev make re2c libstdc++ libgcc libcurl curl-dev mpc1 mpfr3 gmp libgomp coreutils freetype-dev libjpeg-turbo-dev libltdl libmcrypt-dev libpng-dev libxml2-dev expat-dev \
+    autoconf tzdata openntpd file g++ gcc binutils isl libatomic libc-dev musl-dev make re2c libstdc++ libgcc libcurl curl-dev mpc1 mpfr3 gmp libgomp coreutils freetype-dev libjpeg-turbo-dev libltdl libmcrypt-dev libpng-dev libxml2-dev expat-dev icu-dev libxml2-dev \
     && docker-php-ext-install -j$(nproc) iconv mysqli pdo pdo_mysql curl bcmath mbstring json xml zip opcache \
 	&& docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-	&& docker-php-ext-install -j$(nproc) gd
+    && docker-php-ext-configure intl --enable-intl \
+    && docker-php-ext-configure soap --enable-soap \
+	&& docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install soap
 
 # TimeZone
 RUN cp /usr/share/zoneinfo/Asia/Bangkok /etc/localtime \
